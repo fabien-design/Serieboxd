@@ -4,48 +4,54 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.serieboxd.database.AppDatabase
+import com.example.serieboxd.datasource.SerieLocalSource
+import com.example.serieboxd.repository.SerieRepository
 import com.example.serieboxd.ui.components.AppBottomBar
 import com.example.serieboxd.ui.components.AppTopBar
 import com.example.serieboxd.ui.screens.HomeScreen
 import com.example.serieboxd.ui.theme.SerieboxdTheme
+import com.example.serieboxd.viewmodel.SerieViewModel
+import com.example.serieboxd.viewmodel.SerieViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: SerieViewModel by viewModels {
+        val db = AppDatabase.getDatabase(applicationContext)
+        val localSource = SerieLocalSource(db.serieDao())
+        val repository = SerieRepository(localSource)
+        SerieViewModelFactory(repository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SerieboxdTheme() {
-                AppContent()
+            SerieboxdTheme {
+                AppContent(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun AppContent() {
+fun AppContent(viewModel: SerieViewModel) {
     val navController = rememberNavController()
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -74,7 +80,7 @@ fun AppContent() {
                 startDestination = "home",
             ) {
                 composable("home") {
-                    HomeScreen(navController = navController)
+                    HomeScreen(navController = navController, viewModel = viewModel)
                 }
                 composable("login") {
                     Text("login")
@@ -93,13 +99,5 @@ fun AppContent() {
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun AppContentPreview() {
-    SerieboxdTheme {
-        AppContent()
     }
 }

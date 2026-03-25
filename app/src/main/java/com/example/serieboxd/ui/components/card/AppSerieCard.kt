@@ -33,23 +33,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.serieboxd.R
-import com.example.serieboxd.ui.components.card.SeriesItem
-
-data class SeriesItem(
-    val id: Int,
-    val title: String,
-    val genre: String,
-    val year: Int,
-    val image: Int,
-    val currentSeason: Int? = null,
-    val currentEpisode: Int? = null,
-    val totalEpisodes: Int? = null,
-    val rating: Float? = null,
-)
+import com.example.serieboxd.data.entities.Serie
 
 @Composable
 fun AppSerieCard(
-    item: SeriesItem,
+    item: Serie,
     variant: AppSerieCardVariant = AppSerieCardVariant.DEFAULT,
     onClick: () -> Unit
 ) {
@@ -96,7 +84,7 @@ fun AppSerieCard(
 
                 if (variant == AppSerieCardVariant.DEFAULT) {
                     Text(
-                        text = item.genre,
+                        text = item.genres,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -180,6 +168,6 @@ fun CircularProgressWithText(
 @Preview
 @Composable
 fun AppSerieCardPreview() {
-    val item = SeriesItem(1, "Breaking Bad", "Crime · Drame", 2008, R.drawable.breaking_bad, 2, 6, 8, 0.78f)
+    val item = Serie(1, "Breaking Bad", "Une série sur la drogue", "Crime · Drame", 2008, R.drawable.breaking_bad, 2, 6, 8, 0.78f)
     AppSerieCard(item = item, onClick = {})
 }

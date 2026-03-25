@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.2")
     implementation("androidx.compose.ui:ui-text-google-fonts")
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation("androidx.compose.runtime:runtime-livedata")
 
     val roomVersion = "2.8.4"
     implementation("androidx.room:room-runtime:$roomVersion")
