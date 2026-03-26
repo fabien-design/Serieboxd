@@ -1,6 +1,5 @@
 package com.example.serieboxd.ui.components.card
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,13 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.serieboxd.R
+import coil3.compose.AsyncImage
+import com.example.serieboxd.BuildConfig
 import com.example.serieboxd.data.entities.Serie
 
 @Composable
@@ -41,7 +40,7 @@ fun AppSerieCard(
     variant: AppSerieCardVariant = AppSerieCardVariant.DEFAULT,
     onClick: () -> Unit
 ) {
-    Card (
+    Card(
         onClick = onClick,
         modifier = Modifier.width(130.dp),
         colors = CardDefaults.cardColors(
@@ -51,13 +50,14 @@ fun AppSerieCard(
     ) {
         Column {
             Box {
-                Image(
-                    painter = painterResource(item.image),
+                AsyncImage(
+                    model = item.posterPath?.let { "${BuildConfig.TMDB_IMAGE_BASE_URL}$it" },
                     contentDescription = item.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(180.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                 )
                 if (item.rating != null) {
                     CircularProgressWithText(
@@ -146,7 +146,7 @@ fun CircularProgressWithText(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(0.dp)
-        ){
+        ) {
             Text(
                 text = "${(progress * 100).toInt()}",
                 style = MaterialTheme.typography.labelMedium,
@@ -161,13 +161,23 @@ fun CircularProgressWithText(
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }
-
     }
 }
 
 @Preview
 @Composable
 fun AppSerieCardPreview() {
-    val item = Serie(1, "Breaking Bad", "Une série sur la drogue", "Crime · Drame", 2008, R.drawable.breaking_bad, 2, 6, 8, 0.78f)
+    val item = Serie(
+        id = 1,
+        title = "Breaking Bad",
+        description = "Une série sur la drogue",
+        genres = "Crime · Drame",
+        year = 2008,
+        posterPath = null,
+        currentSeason = 2,
+        currentEpisode = 6,
+        totalEpisodes = 8,
+        rating = 0.78f
+    )
     AppSerieCard(item = item, onClick = {})
 }

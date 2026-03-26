@@ -21,9 +21,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.serieboxd.database.AppDatabase
 import com.example.serieboxd.datasource.SerieLocalSource
+import com.example.serieboxd.datasource.SerieRemoteSource
+import com.example.serieboxd.network.RetrofitClient
 import com.example.serieboxd.repository.SerieRepository
 import com.example.serieboxd.ui.components.AppBottomBar
 import com.example.serieboxd.ui.components.AppTopBar
+import com.example.serieboxd.ui.screens.DetailScreen
 import com.example.serieboxd.ui.screens.HomeScreen
 import com.example.serieboxd.ui.theme.SerieboxdTheme
 import com.example.serieboxd.viewmodel.SerieViewModel
@@ -34,7 +37,8 @@ class MainActivity : ComponentActivity() {
     private val viewModel: SerieViewModel by viewModels {
         val db = AppDatabase.getDatabase(applicationContext)
         val localSource = SerieLocalSource(db.serieDao())
-        val repository = SerieRepository(localSource)
+        val remoteSource = SerieRemoteSource(RetrofitClient.tmdbApi)
+        val repository = SerieRepository(localSource, remoteSource, db.cachedSerieDao())
         SerieViewModelFactory(repository)
     }
 
@@ -81,6 +85,10 @@ fun AppContent(viewModel: SerieViewModel) {
             ) {
                 composable("home") {
                     HomeScreen(navController = navController, viewModel = viewModel)
+                }
+                composable("detail/{serieId}") { backStackEntry ->
+                    val serieId = backStackEntry.arguments?.getString("serieId")?.toIntOrNull() ?: return@composable
+                    DetailScreen(serieId = serieId, viewModel = viewModel)
                 }
                 composable("login") {
                     Text("login")

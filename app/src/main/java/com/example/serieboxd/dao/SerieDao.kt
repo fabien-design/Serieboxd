@@ -13,6 +13,6 @@ interface SerieDao {
     @Query("SELECT * FROM Serie WHERE id = :id")
     fun getById(id: Int): Flow<Serie>
 
-    @Query("SELECT * FROM Serie WHERE title LIKE '%:title%'")
+    @Query("SELECT * FROM Serie WHERE title LIKE '%' || :title || '%'")
     fun getByTitle(title: String): Flow<Serie>
 }
