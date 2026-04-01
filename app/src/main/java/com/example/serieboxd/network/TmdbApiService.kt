@@ -21,6 +21,16 @@ interface TmdbApiService {
         @Query("language") language: String = "en-US"
     ): TmdbResponse
 
+    @GET("discover/tv")
+    suspend fun discoverTv(
+        @Query("page") page: Int = 1,
+        @Query("sort_by") sortBy: String = "popularity.desc",
+        @Query("vote_average.gte") voteAverageGte: Int = 5,
+        @Query("vote_average.lte") voteAverageLte: Int = 10,
+        @Query("with_genres") withGenres: String? = null,
+        @Query("language") language: String = "en-US"
+    ): TmdbResponse
+
     @GET("tv/{id}")
     suspend fun getDetails(
         @Path("id") id: Int,

@@ -38,11 +38,12 @@ import com.example.serieboxd.data.entities.Serie
 fun AppSerieCard(
     item: Serie,
     variant: AppSerieCardVariant = AppSerieCardVariant.DEFAULT,
+    width: Float? = null,
     onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier.width(130.dp),
+        modifier = Modifier.width(width?.dp ?: 130.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -70,52 +71,55 @@ fun AppSerieCard(
                     )
                 }
             }
-            Column(
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
 
-                if (variant == AppSerieCardVariant.DEFAULT) {
+            if (variant != AppSerieCardVariant.POSTER_ONLY) {
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     Text(
-                        text = item.genres,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = item.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = item.year.toString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
 
-                if (variant == AppSerieCardVariant.IN_PROGRESS) {
-                    val progress = (item.currentEpisode?.toFloat() ?: 0f) / (item.totalEpisodes?.toFloat() ?: 1f)
+                    if (variant == AppSerieCardVariant.DEFAULT) {
+                        Text(
+                            text = item.genres,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = item.year.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        gapSize = 0.dp,
-                        drawStopIndicator = {},
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Text(
-                        text = "S${item.currentSeason} · EP${item.currentEpisode ?: 0}/${item.totalEpisodes}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    if (variant == AppSerieCardVariant.IN_PROGRESS) {
+                        val progress = (item.currentEpisode?.toFloat() ?: 0f) / (item.totalEpisodes?.toFloat() ?: 1f)
+
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            gapSize = 0.dp,
+                            drawStopIndicator = {},
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text(
+                            text = "S${item.currentSeason} · EP${item.currentEpisode ?: 0}/${item.totalEpisodes}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
         }

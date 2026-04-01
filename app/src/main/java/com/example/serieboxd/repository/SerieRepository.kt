@@ -5,10 +5,20 @@ import com.example.serieboxd.data.entities.Serie
 import com.example.serieboxd.data.entities.toSerie
 import com.example.serieboxd.datasource.SerieLocalSource
 import com.example.serieboxd.datasource.SerieRemoteSource
+import com.example.serieboxd.network.TmdbResponse
 import com.example.serieboxd.network.TmdbTvShow
 import com.example.serieboxd.network.toCachedSerie
 import com.example.serieboxd.network.toSerie
 import kotlinx.coroutines.flow.Flow
+
+
+data class SerieList(
+    val page: Int,
+    val total_pages: Int,
+    val results: List<Serie>
+)
+
+
 
 class SerieRepository(
     private val localSource: SerieLocalSource,
@@ -34,6 +44,25 @@ class SerieRepository(
 
     suspend fun getSerieDetails(id: Int): Serie = remoteSource.getDetails(id).toSerie()
 
+    suspend fun discoverPaged(page: Int,
+                              sortBy: String,
+                              voteAverageGte: Int,
+                              voteAverageLte: Int,
+                              genreId: Int?): SerieList {
+        val response = remoteSource.discoverTv(
+            page,
+            sortBy,
+            voteAverageGte,
+            voteAverageLte,
+            genreId
+        )
+        return SerieList(
+            page = response.page,
+            total_pages = response.total_pages,
+            results = response.results.map { it.toSerie() }
+        )
+    }
+
     private suspend fun getCategoryWithCache(
         category: String,
         fetchFromApi: suspend () -> List<TmdbTvShow>
@@ -51,4 +80,5 @@ class SerieRepository(
         cacheDao.insertAll(results.map { it.toCachedSerie(category) })
         return results.map { it.toSerie() }
     }
+
 }
