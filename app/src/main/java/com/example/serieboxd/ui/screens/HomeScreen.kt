@@ -35,7 +35,7 @@ fun HomeScreen(navController: NavController, viewModel: SerieViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        InProgressSerieboxdSection(navController, inProgress)
+        if (inProgress.isNotEmpty()) InProgressSerieboxdSection(navController, inProgress)
         NewOnSerieboxdSection(navController, onAir)
         PopularSerieboxdSection(navController, popular)
         TopRatedSerieboxdSection(navController, topRated)
