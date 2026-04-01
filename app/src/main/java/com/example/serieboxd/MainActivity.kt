@@ -21,21 +21,35 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.serieboxd.database.AppDatabase
 import com.example.serieboxd.datasource.SerieLocalSource
+import com.example.serieboxd.datasource.SerieRemoteSource
+import com.example.serieboxd.network.RetrofitClient
 import com.example.serieboxd.repository.SerieRepository
 import com.example.serieboxd.ui.components.AppBottomBar
 import com.example.serieboxd.ui.components.AppTopBar
+import com.example.serieboxd.ui.screens.DetailScreen
+import com.example.serieboxd.ui.screens.DiscoverScreen
 import com.example.serieboxd.ui.screens.HomeScreen
 import com.example.serieboxd.ui.theme.SerieboxdTheme
+import com.example.serieboxd.viewmodel.DiscoverViewModel
+import com.example.serieboxd.viewmodel.DiscoverViewModelFactory
 import com.example.serieboxd.viewmodel.SerieViewModel
 import com.example.serieboxd.viewmodel.SerieViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: SerieViewModel by viewModels {
+    private val repository by lazy {
         val db = AppDatabase.getDatabase(applicationContext)
         val localSource = SerieLocalSource(db.serieDao())
-        val repository = SerieRepository(localSource)
+        val remoteSource = SerieRemoteSource(RetrofitClient.tmdbApi)
+        SerieRepository(localSource, remoteSource, db.cachedSerieDao())
+    }
+
+    private val viewModel: SerieViewModel by viewModels {
         SerieViewModelFactory(repository)
+    }
+
+    private val discoverViewModel: DiscoverViewModel by viewModels {
+        DiscoverViewModelFactory(repository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,14 +57,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SerieboxdTheme {
-                AppContent(viewModel)
+                AppContent(viewModel, discoverViewModel)
             }
         }
     }
 }
 
 @Composable
-fun AppContent(viewModel: SerieViewModel) {
+fun AppContent(viewModel: SerieViewModel, discoverViewModel: DiscoverViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -82,6 +96,10 @@ fun AppContent(viewModel: SerieViewModel) {
                 composable("home") {
                     HomeScreen(navController = navController, viewModel = viewModel)
                 }
+                composable("detail/{serieId}") { backStackEntry ->
+                    val serieId = backStackEntry.arguments?.getString("serieId")?.toIntOrNull() ?: return@composable
+                    DetailScreen(serieId = serieId, viewModel = viewModel)
+                }
                 composable("login") {
                     Text("login")
                 }
@@ -89,7 +107,7 @@ fun AppContent(viewModel: SerieViewModel) {
                     Text("register")
                 }
                 composable("discover") {
-                    Text("Discover")
+                    DiscoverScreen(navController = navController, viewModel = discoverViewModel)
                 }
                 composable("watchlist") {
                     Text("Watchlist")

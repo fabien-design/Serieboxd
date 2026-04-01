@@ -12,9 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.serieboxd.data.entities.Serie
 import com.example.serieboxd.ui.components.card.AppSerieCard
@@ -23,7 +23,10 @@ import com.example.serieboxd.viewmodel.SerieViewModel
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: SerieViewModel) {
-    val series by viewModel.allItems.observeAsState(emptyList())
+    val inProgress by viewModel.inProgressSeries.collectAsStateWithLifecycle()
+    val onAir by viewModel.onAirSeries.collectAsStateWithLifecycle()
+    val popular by viewModel.popularSeries.collectAsStateWithLifecycle()
+    val topRated by viewModel.topRatedSeries.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -32,10 +35,10 @@ fun HomeScreen(navController: NavController, viewModel: SerieViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        InProgressSerieboxdSection(navController, series)
-        NewOnSerieboxdSection(navController, series)
-        PopularSerieboxdSection(navController, series)
-        TopRatedSerieboxdSection(navController, series)
+        InProgressSerieboxdSection(navController, inProgress)
+        NewOnSerieboxdSection(navController, onAir)
+        PopularSerieboxdSection(navController, popular)
+        TopRatedSerieboxdSection(navController, topRated)
     }
 }
 
@@ -63,7 +66,7 @@ fun NewOnSerieboxdSection(navController: NavController, series: List<Serie>) {
             items(series) { item ->
                 AppSerieCard(
                     item = item,
-                    onClick = { /* navController.navigate("detail/${item.id}") */ }
+                    onClick = { navController.navigate("detail/${item.id}") }
                 )
             }
         }
@@ -78,7 +81,7 @@ fun PopularSerieboxdSection(navController: NavController, series: List<Serie>) {
             items(series) { item ->
                 AppSerieCard(
                     item = item,
-                    onClick = { /* navController.navigate("detail/${item.id}") */ }
+                    onClick = { navController.navigate("detail/${item.id}") }
                 )
             }
         }
@@ -93,7 +96,7 @@ fun TopRatedSerieboxdSection(navController: NavController, series: List<Serie>) 
             items(series) { item ->
                 AppSerieCard(
                     item = item,
-                    onClick = { /* navController.navigate("detail/${item.id}") */ }
+                    onClick = { navController.navigate("detail/${item.id}") }
                 )
             }
         }
