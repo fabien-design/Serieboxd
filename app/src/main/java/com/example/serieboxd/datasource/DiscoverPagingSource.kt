@@ -23,7 +23,17 @@ class DiscoverPagingSource(
         val page = params.key ?: 1
         Log.d("Discover", "load() — page=$page, catalog=${filters.catalog}, rating=${filters.ratings}, genre=${filters.genreId}")
         return try {
-            val response = repository.discoverPaged(page, filters.catalog.sortBy, voteAverageGte = filters.ratings.voteAverageGte, voteAverageLte = filters.ratings.voteAverageLte,filters.genreId)
+            val response = if (filters.searchRequest.isNotBlank()) {
+                repository.searchTv(filters.searchRequest, page)
+            } else {
+                repository.discoverPaged(
+                    page = page,
+                    sortBy = filters.catalog.sortBy,
+                    voteAverageGte = filters.ratings.voteAverageGte,
+                    voteAverageLte = filters.ratings.voteAverageLte,
+                    genreId = filters.genreId
+                )
+            }
             Log.d("Discover", "Réponse — page=${response.page}, total_pages=${response.total_pages}, résultats=${response.results.size}")
             LoadResult.Page(
                 data = response.results,

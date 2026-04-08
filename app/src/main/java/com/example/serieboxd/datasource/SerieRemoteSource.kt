@@ -20,5 +20,7 @@ class SerieRemoteSource(private val api: TmdbApiService) {
             withGenres = genreId?.toString()
         )
 
+    suspend fun searchTv(query: String, page: Int): TmdbResponse = api.searchTv(query, page)
+
     suspend fun getDetails(id: Int): TmdbTvShow = api.getDetails(id)
 }

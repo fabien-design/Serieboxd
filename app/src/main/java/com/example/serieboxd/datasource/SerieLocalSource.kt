@@ -14,7 +14,4 @@ class SerieLocalSource(private val serieDao: SerieDao) {
         return serieDao.getById(id)
     }
 
-    fun getSeriesByTitle(title: String): Flow<Serie> {
-        return serieDao.getByTitle(title)
-    }
 }

@@ -27,6 +27,10 @@ class DiscoverViewModel(private val repository: SerieRepository) : ViewModel() {
         }.flow
     }.cachedIn(viewModelScope)
 
+    fun setSearchRequest(request: String) {
+        _filters.update { it.copy(searchRequest = request) }
+    }
+
     fun setRatings(rating: RatingsFilter) {
         _filters.update { it.copy(ratings = rating) }
     }

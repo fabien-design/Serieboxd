@@ -16,6 +16,7 @@ enum class RatingsFilter(val label: String, val voteAverageGte: Int, val voteAve
 }
 
 data class DiscoverFilters(
+    val searchRequest: String = "",
     val catalog: CatalogFilter = CatalogFilter.TRENDING,
     val ratings: RatingsFilter = RatingsFilter.DEFAULT,
     val genreId: Int? = null

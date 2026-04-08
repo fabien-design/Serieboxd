@@ -36,4 +36,10 @@ interface TmdbApiService {
         @Path("id") id: Int,
         @Query("language") language: String = "en-US"
     ): TmdbTvShow
+
+    @GET("search/tv")
+    suspend fun searchTv(
+        @Query("query") query: String,
+        @Query("page") page: Int = 1
+    ): TmdbResponse
 }

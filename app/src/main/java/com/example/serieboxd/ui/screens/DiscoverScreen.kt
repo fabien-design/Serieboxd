@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -32,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -49,10 +53,12 @@ import com.example.serieboxd.viewmodel.RatingsFilter
 fun DiscoverScreen(navController: NavController, viewModel: DiscoverViewModel) {
     val lazyItems = viewModel.series.collectAsLazyPagingItems()
     val filters by viewModel.filters.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     var showRatingsSheet by remember { mutableStateOf(false) }
     var showCatalogSheet by remember { mutableStateOf(false) }
     var showGenreSheet by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
 
     LaunchedEffect(lazyItems.loadState) {
         Log.d("Discover", "loadState — refresh=${lazyItems.loadState.refresh}, append=${lazyItems.loadState.append}, itemCount=${lazyItems.itemCount}")
@@ -60,12 +66,23 @@ fun DiscoverScreen(navController: NavController, viewModel: DiscoverViewModel) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         TextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Search...") },
+            value = search,
+            onValueChange = { search = it },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (search.isNotBlank() && search.length > 2 && search.length < 100) {
+                        viewModel.setSearchRequest(search)
+                        focusManager.clearFocus() // Optionnel : masquer le clavier
+                    }
+                }
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp, 16.dp)
+                .padding(8.dp, 16.dp),
+            label = { Text("Search") },
+            placeholder = { Text("Search...")}
         )
 
         Row(
