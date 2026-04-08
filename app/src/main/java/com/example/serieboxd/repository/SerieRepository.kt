@@ -63,6 +63,15 @@ class SerieRepository(
         )
     }
 
+    suspend fun searchTv(query: String, page: Int): SerieList {
+        val response = remoteSource.searchTv(query, page)
+        return SerieList(
+            page = response.page,
+            total_pages = response.total_pages,
+            results = response.results.map { it.toSerie() }
+        )
+    }
+
     private suspend fun getCategoryWithCache(
         category: String,
         fetchFromApi: suspend () -> List<TmdbTvShow>
